@@ -1,3 +1,6 @@
-import { a } from './example'
-a()
-console.log('done')
+import { getAllRepos, delBtn } from './init'
+
+window.addEventListener('DOMContentLoaded', function () {
+  getAllRepos()
+  delBtn()
+})
