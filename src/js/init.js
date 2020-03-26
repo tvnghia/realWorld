@@ -22,10 +22,8 @@ export const signUp = () => {
         }
       })
         .then(res => {
-          localStorage.setItem('token', res.data.user.token)
-          localStorage.setItem('username', res.data.user.username)
-          localStorage.setItem('email', res.data.user.email)
-          localStorage.setItem('image', 'amwkdmk')
+          localStorage.setItem('info', JSON.stringify(res.data.user))
+          localStorage.setItem('image', 'https://static.productionready.io/images/smiley-cyrus.jpg')
           window.location = 'index.html'
         })
         .catch(err => {
@@ -61,7 +59,7 @@ export const signUp = () => {
           if (arr.password) {
             let text = ''
             arr.password.map(item => {
-              text += `<li class='err-email'>Password ${item}</li>`
+              text += `<li class='err-password'>Password ${item}</li>`
               document.querySelector('.error-password').innerHTML = text
             })
           } else {
@@ -76,16 +74,14 @@ export const signUp = () => {
 
 // Check token
 export const checkUser = () => {
-  if (localStorage.token) {
-    document.querySelector('.regis').innerHTML = localStorage.username
+  if (localStorage.info) {
+    document.querySelector('.regis').innerHTML = JSON.parse(localStorage.info).username
     document.querySelector('.regis').setAttribute('href', 'profile.html')
     document.querySelector('.post-new-article').parentNode.classList.remove('hidden')
   } else {
     document.querySelector('.post-new-article').parentNode.classList.add('hidden')
-    if (document.querySelector('.setting')) {
-      document.querySelector('.setting').innerHTML = 'Sign in'
-      document.querySelector('.setting').setAttribute('href', 'login.html')
-    }
+    document.querySelector('.setting').innerHTML = 'Sign in'
+    document.querySelector('.setting').setAttribute('href', 'login.html')
   }
 }
 
@@ -108,9 +104,8 @@ export const loGin = () => {
         }
       })
         .then(res => {
-          localStorage.setItem('token', res.data.user.token)
-          localStorage.setItem('username', res.data.user.username)
-          localStorage.setItem('email', res.data.user.email)
+          localStorage.setItem('info', JSON.stringify(res.data.user))
+          localStorage.setItem('image', 'https://static.productionready.io/images/smiley-cyrus.jpg')
           window.location = 'index.html'
         })
         .catch(err => { throw err })
@@ -127,7 +122,7 @@ export const updateUser = () => {
         method: 'put',
         url: '/user',
         headers: {
-          Authorization: 'Token ' + localStorage.token,
+          Authorization: 'Token ' + JSON.parse(localStorage.info).token,
           'Content-type': 'application/json; charset=utf-8'
         },
         data: {
@@ -141,10 +136,10 @@ export const updateUser = () => {
         }
       })
         .then(res => {
-          localStorage.setItem('user', JSON.stringify(res.data.user))
-          localStorage.setItem('token', res.data.user.token)
-          localStorage.setItem('username', res.data.user.username)
-          localStorage.setItem('email', res.data.user.email)
+          localStorage.setItem('info', JSON.stringify(res.data.user))
+          // localStorage.setItem('token', res.data.user.token)
+          // localStorage.setItem('username', res.data.user.username)
+          // localStorage.setItem('email', res.data.user.email)
           window.location = 'profile.html'
         })
         .catch(err => { throw err })
@@ -154,18 +149,18 @@ export const updateUser = () => {
 
 // Show new user after PUT
 export const newUser = () => {
-  if (localStorage.user) {
+  if (localStorage.info) {
     if (document.querySelector('.user-img')) {
-      if (JSON.parse(localStorage.user).image === '') {
-        document.querySelector('.user-img').setAttribute('src', 'https://static.productionready.io/images/smiley-cyrus.jpg')
+      if (JSON.parse(localStorage.info).image) {
+        document.querySelector('.user-img').setAttribute('src', JSON.parse(localStorage.info).image)
       } else {
-        document.querySelector('.user-img').setAttribute('src', JSON.parse(localStorage.user).image)
+        document.querySelector('.user-img').setAttribute('src', localStorage.image)
       }
       if (document.querySelector('.name-user')) {
-        document.querySelector('.name-user').innerHTML = JSON.parse(localStorage.user).username
+        document.querySelector('.name-user').innerHTML = JSON.parse(localStorage.info).username
       }
       if (document.querySelector('.bio')) {
-        document.querySelector('.bio').innerHTML = JSON.parse(localStorage.user).bio
+        document.querySelector('.bio').innerHTML = JSON.parse(localStorage.info).bio
       }
     }
   }
@@ -222,7 +217,6 @@ export const getProfile = () => {
       }
     })
       .then(res => {
-        console.log(res.data.profile)
         document.querySelector('.user-img').setAttribute('src', res.data.profile.image)
         document.querySelector('.name-user').innerHTML = res.data.profile.username
         document.querySelector('.bio').innerHTML = res.data.profile.bio
@@ -235,20 +229,19 @@ export const getProfile = () => {
 
 // get user
 export const getUser = () => {
-  if (localStorage.token) {
+  if (localStorage.info) {
     document.querySelector('.regis').addEventListener('click', e => {
       e.preventDefault()
       return axios({
         method: 'get',
         url: '/user',
         headers: {
-          Authorization: 'Token ' + localStorage.token,
+          Authorization: 'Token ' + JSON.parse(localStorage.info).token,
           'Content-type': 'application/json; charset=utf-8'
         }
       })
         .then(res => {
-          localStorage.setItem('user', JSON.stringify(res.data.user))
-          console.log(JSON.parse(localStorage.user).image)
+          // localStorage.setItem('user', JSON.stringify(res.data.user))
           window.location = 'profile.html'
         })
         .catch(err => { throw err })
@@ -258,18 +251,18 @@ export const getUser = () => {
 
 // show user
 export const showUser = () => {
-  if (localStorage.user) {
+  if (localStorage.info) {
     if (document.querySelector('.user-img')) {
-      if (!JSON.parse(localStorage.user).image) {
+      if (!JSON.parse(localStorage.info).image) {
         document.querySelector('.user-img').setAttribute('src', 'https://static.productionready.io/images/smiley-cyrus.jpg')
       } else {
-        document.querySelector('.user-img').setAttribute('src', JSON.parse(localStorage.user).image)
+        document.querySelector('.user-img').setAttribute('src', JSON.parse(localStorage.info).image)
       }
       if (document.querySelector('.name-user')) {
-        document.querySelector('.name-user').innerHTML = JSON.parse(localStorage.user).username
+        document.querySelector('.name-user').innerHTML = JSON.parse(localStorage.info).username
       }
       if (document.querySelector('.bio')) {
-        document.querySelector('.bio').innerHTML = JSON.parse(localStorage.user).bio
+        document.querySelector('.bio').innerHTML = JSON.parse(localStorage.info).bio
       }
       if (document.querySelector('.btn-follow')) {
         document.querySelector('.btn-follow').classList.add('hidden')
@@ -302,9 +295,6 @@ export const getArticle = () => {
 
         document.querySelectorAll('.author').forEach(e => {
           e.innerHTML = res.data.article.author.username
-        })
-
-        document.querySelectorAll('.author').forEach(e => {
           e.setAttribute('href', `profile.html?exam=${res.data.article.author.username}`)
         })
 
@@ -317,14 +307,17 @@ export const getArticle = () => {
           document.querySelector('.article-body').innerHTML = res.data.article.body
         })
 
-        if (JSON.parse(localStorage.user).image) {
-          document.querySelector('.comment-author-img').setAttribute('src', JSON.parse(localStorage.user).image)
+        // Check img
+        const infoLocal = JSON.parse(localStorage.info)
+        if (infoLocal.image) {
+          document.querySelector('.comment-author-img').setAttribute('src', infoLocal.image
+          )
         } else {
-          document.querySelector('.comment-author-img').setAttribute('src', 'https://static.productionready.io/images/smiley-cyrus.jpg')
+          document.querySelector('.comment-author-img').setAttribute('src', localStorage.getItem('image'))
         }
       })
       .catch(err => {
-        console.log(err)
+        throw err
       })
   }
 }
@@ -339,7 +332,7 @@ export const createCmt = () => {
         method: 'post',
         url: '/articles/' + e.target.dataset.slug + '/comments',
         headers: {
-          Authorization: 'Token ' + localStorage.token,
+          Authorization: 'Token ' + JSON.parse(localStorage.info).token,
           'Content-type': 'application/json; charset=utf-8'
         },
         data: {
@@ -349,7 +342,7 @@ export const createCmt = () => {
         }
       })
         .then(res => {
-          console.log(res.data.comment)
+          console.log(res)
           const text =
             `
               <div class="card">
@@ -357,22 +350,127 @@ export const createCmt = () => {
                   <p class="card-text">${res.data.comment.body}</p>
                 </div>
                 <div class="card-footer">
-                  <a href="profile.html?exam=${JSON.parse(localStorage.user).image}" class="comment-author">
-                    <img src="${res.data.comment.author.image}" class="comment-author-img" />
+                  <a href="profile.html?exam=${JSON.parse(localStorage.info).username}" class="comment-author">
+                    <img src="${localStorage.image}" class="comment-author-img" />
                   </a>
                   &nbsp;
-                  <a href="profile.html?exam=${JSON.parse(localStorage.user).image}" class="comment-author">${res.data.comment.author.username}</a>
+                  <a href="profile.html?exam=${JSON.parse(localStorage.info).username}" class="comment-author">${res.data.comment.author.username}</a>
                   <span class="date-posted">Dec 29th</span>
-                  <span class="mod-options">
+                  <span class="mod-options" data-user='${res.data.comment.author.username}'>
                     <i class="ion-edit"></i>
-                    <i class="ion-trash-a"></i>
+                    <i data-del=${res.data.comment.id} class="ion-trash-a"></i>
                   </span>
                 </div>
               </div>
             `
-          document.querySelector('.list-comment').insertAdjacentHTML('beforebegin', text)
+          document.querySelector('.list-comment').insertAdjacentHTML('afterbegin', text)
+          document.querySelector('.body-cmt').value = ''
+
+          // check src img
+          if (JSON.parse(localStorage.info).image) {
+            document.querySelector('.comment-author-img').setAttribute('src', JSON.parse(localStorage.info).image)
+          }
+
+          if (document.querySelector('.err-body')) {
+            document.querySelector('.err-body').remove()
+          }
+
+          // Check icon Trash and Edit
+          const infoLocal = JSON.parse(localStorage.info).username
+          document.querySelectorAll('[data-user]').forEach(item => {
+            if (item.dataset.user !== infoLocal) {
+              item.classList.add('hidden')
+            }
+          })
+
+          delCmt()
         })
-        .catch(err => { throw err })
+        .catch(err => {
+          if (err.response.data.errors.body) {
+            let text = ''
+            err.response.data.errors.body.map(item => {
+              text += `<p class='err-body'>Comment ${item}</p>`
+              document.querySelector('.error-body').innerHTML = text
+            })
+          }
+        })
+    })
+  }
+}
+
+// Get comment
+export const getComment = () => {
+  const urlString = new URLSearchParams(window.location.search)
+  if (urlString.has('feed')) {
+    return axios({
+      method: 'get',
+      headers: {
+        'Content-type': 'application/json; charset=utf-8'
+      },
+      url: '/articles/' + urlString.get('feed') + '/comments'
+    })
+      .then(res => {
+        let text = ''
+        res.data.comments.map(item => {
+          text += `
+            <div class="card">
+              <div class="card-block">
+                <p class="card-text">${item.body}</p>
+              </div>
+              <div class="card-footer">
+                <a href="profile.html?exam=${JSON.parse(localStorage.info).username}" class="comment-author">
+                  <img src="${localStorage.image}" class="comment-author-img" />
+                </a>
+                &nbsp;
+                <a href="profile.html?exam=${JSON.parse(localStorage.info).username}"            class="comment-author commented">${item.author.username}</a>
+                <span class="date-posted">Dec 29th</span>
+                <span data-user='${item.author.username}' class="mod-options">
+                  <i class="ion-edit"></i>
+                  <i data-del=${item.id} class="ion-trash-a"></i>
+                </span>
+                </div>
+            </div>
+          `
+          document.querySelector('.list-comment').innerHTML = text
+          // check src img
+          if (item.author.image) {
+            document.querySelector('.comment-author-img').setAttribute('src', JSON.parse(localStorage.info).image)
+          }
+        })
+
+        // Check icon Trash and Edit
+        const infoLocal = JSON.parse(localStorage.info)
+        document.querySelectorAll('[data-user]').forEach(item => {
+          if (item.dataset.user !== infoLocal.username) {
+            item.classList.add('hidden')
+          }
+        })
+
+        delCmt()
+      })
+      .catch(err => { throw err })
+  }
+}
+
+// Delete comment
+export const delCmt = () => {
+  const urlString = new URLSearchParams(window.location.search)
+  if (urlString.has('feed')) {
+    document.querySelectorAll('.ion-trash-a').forEach(btn => {
+      btn.addEventListener('click', e => {
+        return axios({
+          method: 'delete',
+          headers: {
+            'Content-type': 'application/json; charset=utf-8',
+            Authorization: 'Token ' + JSON.parse(localStorage.info).token
+          },
+          url: '/articles/' + urlString.get('feed') + '/comments/' + e.target.dataset.del
+        })
+          .then(res => {
+            e.target.parentNode.parentNode.parentNode.remove()
+          })
+          .catch(err => { throw err })
+      })
     })
   }
 }
