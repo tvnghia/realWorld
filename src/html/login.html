@@ -16,7 +16,7 @@
         <ul class="nav navbar-nav pull-xs-right">
           <li class="nav-item">
           <!-- Add "active" class when you're on that page" -->
-          <a class="nav-link active" href="">Home</a>
+          <a class="nav-link active" href="./index.html">Home</a>
           </li>
           <li class="nav-item">
             <a class="nav-link post-new-article" href="./create-edit-article.html">
@@ -24,65 +24,43 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link setting" href="./setting.html">
-            <i class="ion-gear-a"></i>&nbsp;Settings
+            <a class="nav-link" href="login.html">
+            <i class="ion-gear-a"></i>&nbsp;Sign in
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link regis" href="./signup.html">Sign up</a>
+            <a class="nav-link xxx" href="./signup.html">Sign up</a>
           </li>
         </ul>
       </div>
     </nav>
 
-    <!--Home-->
-    <div class="home-page">
-
-      <div class="banner">
-        <div class="container">
-          <h1 class="logo-font">conduit</h1>
-          <p>A place to share your knowledge.</p>
-        </div>
-      </div>
-    
+    <!--Login-->
+    <div class="auth-page">
       <div class="container page">
         <div class="row">
     
-          <div class="col-md-9">
-            <div class="feed-toggle">
-              <ul class="nav nav-pills outline-active">
-                <li class="nav-item">
-                  <a class="nav-link disabled" href="">Your Feed</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link active" href="">Global Feed</a>
-                </li>
-              </ul>
-            </div>
-            <div class="list-article">
-            </div>
-          </div>
+          <div class="col-md-6 offset-md-3 col-xs-12">
+            <h1 class="text-xs-center">Sign in</h1>
+            <p class="text-xs-center">
+              <a href="signup.html">Need an account?</a>
+            </p>
     
-          <div class="col-md-3">
-            <div class="sidebar">
-              <p>Popular Tags</p>
-    
-              <div class="tag-list">
-                <a href="" class="tag-pill tag-default">programming</a>
-                <a href="" class="tag-pill tag-default">javascript</a>
-                <a href="" class="tag-pill tag-default">emberjs</a>
-                <a href="" class="tag-pill tag-default">angularjs</a>
-                <a href="" class="tag-pill tag-default">react</a>
-                <a href="" class="tag-pill tag-default">mean</a>
-                <a href="" class="tag-pill tag-default">node</a>
-                <a href="" class="tag-pill tag-default">rails</a>
-              </div>
-            </div>
+            <form>
+              <fieldset class="form-group">
+                <input class="form-control form-control-lg email" type="text" placeholder="Email">
+              </fieldset>
+              <fieldset class="form-group">
+                <input class="form-control form-control-lg pass" type="password" placeholder="Password">
+              </fieldset>
+              <button class="btn btn-lg btn-primary pull-xs-right sign-in">
+                Sign in
+              </button>
+            </form>
           </div>
     
         </div>
       </div>
-    
     </div>
 
     <footer>

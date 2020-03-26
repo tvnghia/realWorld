@@ -1,6 +1,15 @@
-import { getAllRepos, delBtn } from './init'
+import { checkUser, signUp, loGin, updateUser, listArticle, getProfile, getUser, showUser, newUser, getArticle, createCmt } from './init'
 
 window.addEventListener('DOMContentLoaded', function () {
-  getAllRepos()
-  delBtn()
+  signUp()
+  checkUser()
+  loGin()
+  updateUser()
+  listArticle()
+  getProfile()
+  getUser()
+  showUser()
+  newUser()
+  getArticle()
+  createCmt()
 })

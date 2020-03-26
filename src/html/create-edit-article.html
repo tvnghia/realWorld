@@ -16,7 +16,7 @@
         <ul class="nav navbar-nav pull-xs-right">
           <li class="nav-item">
           <!-- Add "active" class when you're on that page" -->
-          <a class="nav-link active" href="">Home</a>
+          <a class="nav-link active" href="./index.html">Home</a>
           </li>
           <li class="nav-item">
             <a class="nav-link post-new-article" href="./create-edit-article.html">
@@ -35,54 +35,35 @@
       </div>
     </nav>
 
-    <!--Home-->
-    <div class="home-page">
-
-      <div class="banner">
-        <div class="container">
-          <h1 class="logo-font">conduit</h1>
-          <p>A place to share your knowledge.</p>
-        </div>
-      </div>
-    
+    <!--Create/Edit Article-->
+    <div class="editor-page">
       <div class="container page">
         <div class="row">
     
-          <div class="col-md-9">
-            <div class="feed-toggle">
-              <ul class="nav nav-pills outline-active">
-                <li class="nav-item">
-                  <a class="nav-link disabled" href="">Your Feed</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link active" href="">Global Feed</a>
-                </li>
-              </ul>
-            </div>
-            <div class="list-article">
-            </div>
-          </div>
-    
-          <div class="col-md-3">
-            <div class="sidebar">
-              <p>Popular Tags</p>
-    
-              <div class="tag-list">
-                <a href="" class="tag-pill tag-default">programming</a>
-                <a href="" class="tag-pill tag-default">javascript</a>
-                <a href="" class="tag-pill tag-default">emberjs</a>
-                <a href="" class="tag-pill tag-default">angularjs</a>
-                <a href="" class="tag-pill tag-default">react</a>
-                <a href="" class="tag-pill tag-default">mean</a>
-                <a href="" class="tag-pill tag-default">node</a>
-                <a href="" class="tag-pill tag-default">rails</a>
-              </div>
-            </div>
+          <div class="col-md-10 offset-md-1 col-xs-12">
+            <form>
+              <fieldset>
+                <fieldset class="form-group">
+                    <input type="text" class="form-control form-control-lg" placeholder="Article Title">
+                </fieldset>
+                <fieldset class="form-group">
+                    <input type="text" class="form-control" placeholder="What's this article about?">
+                </fieldset>
+                <fieldset class="form-group">
+                    <textarea class="form-control" rows="8" placeholder="Write your article (in markdown)"></textarea>
+                </fieldset>
+                <fieldset class="form-group">
+                    <input type="text" class="form-control" placeholder="Enter tags"><div class="tag-list"></div>
+                </fieldset>
+                <button class="btn btn-lg pull-xs-right btn-primary" type="button">
+                    Publish Article
+                </button>
+              </fieldset>
+            </form>
           </div>
     
         </div>
       </div>
-    
     </div>
 
     <footer>
