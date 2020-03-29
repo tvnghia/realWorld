@@ -1,12 +1,14 @@
 import axios from 'axios'
-
+import { favorBtn, unfavorBtn } from './article'
 axios.defaults.baseURL = 'https://conduit.productionready.io/api'
+axios.defaults.headers.common.Authorization = 'Token ' + JSON.parse(localStorage.info).token
 
 // Event signup
 export const signUp = () => {
   if (document.querySelector('.sign-up')) {
     document.querySelector('.sign-up').addEventListener('click', e => {
       e.preventDefault()
+      console.log('adwjndj')
       return axios({
         method: 'post',
         url: '/users',
@@ -122,7 +124,6 @@ export const updateUser = () => {
         method: 'put',
         url: '/user',
         headers: {
-          Authorization: 'Token ' + JSON.parse(localStorage.info).token,
           'Content-type': 'application/json; charset=utf-8'
         },
         data: {
@@ -137,9 +138,6 @@ export const updateUser = () => {
       })
         .then(res => {
           localStorage.setItem('info', JSON.stringify(res.data.user))
-          // localStorage.setItem('token', res.data.user.token)
-          // localStorage.setItem('username', res.data.user.username)
-          // localStorage.setItem('email', res.data.user.email)
           window.location = 'profile.html'
         })
         .catch(err => { throw err })
@@ -168,50 +166,542 @@ export const newUser = () => {
 
 // List Article
 export const listArticle = () => {
-  return axios({
-    method: 'get',
-    url: '/articles',
-    headers: {
-      'Content-type': 'application/json; charset=utf-8'
-    }
-  })
-    .then(res => {
-      let text = ''
-      res.data.articles.map(item => {
-        text += `
-        <div class="article-preview">
-          <div class="article-meta">
-            <a href='/profile.html?exam=${item.author.username}'><img src="${item.author.image}" /></a>
-            <div class="info">
-              <a href='/profile.html?exam=${item.author.username}' data-article='${item.author.username}' class="author">${item.author.username}</a>
-              <span class="date">January 20th</span>
-            </div>
-            <button class="btn btn-outline-primary btn-sm pull-xs-right">
-              <i class="ion-heart"></i> 29
-            </button>
-          </div>
-          <a href="article.html?feed=${item.slug}" class="preview-link">
-            <h1>${item.title}</h1>
-            <p>${item.slug}</p>
-            <span>Read more...</span>
-          </a>
-        </div>
-        `
-        if (document.querySelector('.list-article')) {
-          document.querySelector('.list-article').innerHTML = text
+  const urlString = new URLSearchParams(window.location.search)
+  // Get article in homepage
+  if (document.querySelector('.home-page')) {
+    // Get article in local feed
+    if (!window.location.search) {
+      return axios({
+        method: 'get',
+        url: '/articles?offset=0&limit=100',
+        headers: {
+          'Content-type': 'application/json; charset=utf-8'
         }
       })
-    })
-    .catch(err => { throw err })
+        .then(res => {
+          console.log(res)
+          let text = ''
+          res.data.articles.map(item => {
+            // Check img
+            if (!item.author.image) {
+              item.author.image = localStorage.image
+            }
+
+            // Create tag
+            let tag = ''
+            item.tagList.map(x => {
+              tag += `
+                <li class="tag-default tag-pill tag-outline"><span>${x}</span></li>
+              `
+            })
+
+            // Show favor or unfavor
+            let btn = ''
+            if (item.favorited) {
+              btn = `
+                <button data-slug=${item.slug} class="btn btn-outline-primary btn-sm pull-xs-right btn-favorite hidden">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+                <button data-slug=${item.slug} class="btn btn-primary btn-sm pull-xs-right btn-unfavorite">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+                
+                `
+            } else {
+              btn = `
+                <button data-slug=${item.slug} class="btn btn-outline-primary btn-sm pull-xs-right btn-favorite">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+                <button data-slug=${item.slug} class="btn btn-primary btn-sm pull-xs-right btn-unfavorite hidden">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+              `
+            }
+            text += `
+            <div class="article-preview">
+              <div class="article-meta">
+                <a href='/profile.html?author=${item.author.username}'><img src="${item.author.image}" /></a>
+                <div class="info">
+                  <a href='/profile.html?author=${item.author.username}' data-article='${item.author.username}' class="author">${item.author.username}</a>
+                  <span class="date">January 20th</span>
+                </div>
+                ${btn}
+              </div>
+              <a href="article.html?feed=${item.slug}" class="preview-link">
+                <h1>${item.title}</h1>
+                <p>${item.body}</p>
+                <span>Read more...</span>
+                <ul class="tag-list-art">
+                  ${tag}
+                </ul>
+              </a>
+            </div>
+            `
+
+            if (document.querySelector('.list-article')) {
+              document.querySelector('.list-article').innerHTML = text
+            }
+          })
+          favorBtn()
+          unfavorBtn()
+        })
+        .catch(err => { throw err })
+    } else if (urlString.has('tag')) { // Get article filter by tag
+      return axios({
+        method: 'get',
+        headers: {
+          'Content-type': 'application/json; charset=utf-8'
+        },
+        url: `/articles?tag=${urlString.get('tag')}`
+      })
+        .then(res => {
+          let text = ''
+          res.data.articles.map(item => {
+            // Check img
+            if (!item.author.image) {
+              item.author.image = localStorage.image
+            }
+            let tag = ''
+            item.tagList.map(x => {
+              tag += `
+                <li class="tag-default tag-pill tag-outline"><span>${x}</span></li>
+              `
+            })
+            // Show favor or unfavor
+            let btn = ''
+            if (item.favorited) {
+              btn = `
+                <button data-slug=${item.slug} class="btn btn-outline-primary btn-sm pull-xs-right btn-favorite hidden">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+                <button data-slug=${item.slug} class="btn btn-primary btn-sm pull-xs-right btn-unfavorite">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+                
+                `
+            } else {
+              btn = `
+                <button data-slug=${item.slug} class="btn btn-outline-primary btn-sm pull-xs-right btn-favorite">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+                <button data-slug=${item.slug} class="btn btn-primary btn-sm pull-xs-right btn-unfavorite hidden">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+              `
+            }
+            text += `
+            <div class="article-preview">
+              <div class="article-meta">
+                <a href='/profile.html?author=${item.author.username}'><img src="${item.author.image}" /></a>
+                <div class="info">
+                  <a href='/profile.html?author=${item.author.username}' data-article='${item.author.username}' class="author">${item.author.username}</a>
+                  <span class="date">January 20th</span>
+                </div>
+                ${btn}
+              </div>
+              <a href="article.html?feed=${item.slug}" class="preview-link">
+                <h1>${item.title}</h1>
+                <p>${item.body}</p>
+                <span>Read more...</span>
+                <ul class="tag-list-art">
+                  ${tag}
+                </ul>
+              </a>
+            </div>
+            `
+
+            if (document.querySelector('.list-article')) {
+              document.querySelector('.list-article').innerHTML = text
+            }
+          })
+          favorBtn()
+          unfavorBtn()
+        })
+        .catch(err => { throw err })
+    }
+  } else if (document.querySelector('.profile-page')) {
+    // Get article's User in profile page
+    if (!window.location.search) {
+      return axios({
+        method: 'get',
+        headers: {
+          'Content-type': 'application/json; charset=utf-8'
+        },
+        url: `/articles?author=${JSON.parse(localStorage.info).username}`
+      })
+        .then(res => {
+          let text = ''
+          res.data.articles.map(item => {
+            // Check img
+            if (!item.author.image) {
+              item.author.image = localStorage.image
+            }
+            let tag = ''
+            item.tagList.map(x => {
+              tag += `
+                <li class="tag-default tag-pill tag-outline"><span>${x}</span></li>
+              `
+            })
+            // Show favor or unfavor
+            let btn = ''
+            if (item.favorited) {
+              btn = `
+                <button data-slug=${item.slug} class="btn btn-outline-primary btn-sm pull-xs-right btn-favorite hidden">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+                <button data-slug=${item.slug} class="btn btn-primary btn-sm pull-xs-right btn-unfavorite">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+                
+                `
+            } else {
+              btn = `
+                <button data-slug=${item.slug} class="btn btn-outline-primary btn-sm pull-xs-right btn-favorite">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+                <button data-slug=${item.slug} class="btn btn-primary btn-sm pull-xs-right btn-unfavorite hidden">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+              `
+            }
+            text += `
+            <div class="article-preview">
+              <div class="article-meta">
+                <a href='/profile.html?author=${item.author.username}'><img src="${item.author.image}" /></a>
+                <div class="info">
+                  <a href='/profile.html?author=${item.author.username}' data-article='${item.author.username}' class="author">${item.author.username}</a>
+                  <span class="date">January 20th</span>
+                </div>
+                ${btn}
+              </div>
+              <a href="article.html?feed=${item.slug}" class="preview-link">
+                <h1>${item.title}</h1>
+                <p>${item.body}</p>
+                <span>Read more...</span>
+                <ul class="tag-list-art">
+                  ${tag}
+                </ul>
+              </a>
+            </div>
+            `
+
+            if (document.querySelector('.list-article')) {
+              document.querySelector('.list-article').innerHTML = text
+            }
+          })
+          // Set Href for toggle favorite
+          document.querySelector('.toggle-favor').setAttribute('href', `profile.html?favor=${JSON.parse(localStorage.info).username}`)
+
+          favorBtn()
+          unfavorBtn()
+        })
+        .catch(err => { throw err })
+    } else if (urlString.has('author')) { // Get article's Author filter by author
+      return axios({
+        method: 'get',
+        headers: {
+          'Content-type': 'application/json; charset=utf-8'
+        },
+        url: `/articles?author=${urlString.get('author')}`
+      })
+        .then(res => {
+          let text = ''
+          res.data.articles.map(item => {
+            // Check img
+            if (!item.author.image) {
+              item.author.image = localStorage.image
+            }
+            let tag = ''
+            item.tagList.map(x => {
+              tag += `
+                <li class="tag-default tag-pill tag-outline"><span>${x}</span></li>
+              `
+            })
+            // Show favor or unfavor
+            let btn = ''
+            if (item.favorited) {
+              btn = `
+                <button data-slug=${item.slug} class="btn btn-outline-primary btn-sm pull-xs-right btn-favorite hidden">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+                <button data-slug=${item.slug} class="btn btn-primary btn-sm pull-xs-right btn-unfavorite">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+                
+                `
+            } else {
+              btn = `
+                <button data-slug=${item.slug} class="btn btn-outline-primary btn-sm pull-xs-right btn-favorite">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+                <button data-slug=${item.slug} class="btn btn-primary btn-sm pull-xs-right btn-unfavorite hidden">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+              `
+            }
+            text += `
+            <div class="article-preview">
+              <div class="article-meta">
+                <a href='/profile.html?author=${item.author.username}'><img src="${item.author.image}" /></a>
+                <div class="info">
+                  <a href='/profile.html?author=${item.author.username}' data-article='${item.author.username}' class="author">${item.author.username}</a>
+                  <span class="date">January 20th</span>
+                </div>
+                ${btn}
+              </div>
+              <a href="article.html?feed=${item.slug}" class="preview-link">
+                <h1>${item.title}</h1>
+                <p>${item.body}</p>
+                <span>Read more...</span>
+                <ul class="tag-list-art">
+                  ${tag}
+                </ul>
+              </a>
+            </div>
+            `
+            if (document.querySelector('.list-article')) {
+              document.querySelector('.list-article').innerHTML = text
+            }
+          })
+          // Set href for toggle favorite
+          document.querySelector('.toggle-favor').setAttribute('href', `profile.html?favor=${JSON.parse(localStorage.profile).username}`)
+
+          favorBtn()
+          unfavorBtn()
+        })
+        .catch(err => { throw err })
+    }
+  }
+}
+
+// get article's user by favorite
+export const favorArt = () => {
+  const urlString = new URLSearchParams(window.location.search)
+  const profileLocal = JSON.parse(localStorage.profile).username
+  const infoLocal = JSON.parse(localStorage.info).username
+
+  if (document.querySelector('.profile-page') && urlString.has('favor')) {
+    if (urlString.get('favor') === profileLocal) {
+      console.log('sa')
+      return axios({
+        method: 'get',
+        headers: {
+          'Content-type': 'application/json; charset=utf-8'
+        },
+        url: `/articles?favorited=${profileLocal}`
+      })
+        .then(res => {
+          console.log(res)
+          let text = ''
+          res.data.articles.map(item => {
+            // Check img
+            if (!item.author.image) {
+              item.author.image = localStorage.image
+            }
+            let tag = ''
+            item.tagList.map(x => {
+              tag += `
+                <li class="tag-default tag-pill tag-outline"><span>${x}</span></li>
+              `
+            })
+            // Show favor or unfavor
+            let btn = ''
+            if (item.favorited) {
+              btn = `
+                <button data-slug=${item.slug} class="btn btn-outline-primary btn-sm pull-xs-right btn-favorite hidden">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+                <button data-slug=${item.slug} class="btn btn-primary btn-sm pull-xs-right btn-unfavorite">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+                
+                `
+            } else {
+              btn = `
+                <button data-slug=${item.slug} class="btn btn-outline-primary btn-sm pull-xs-right btn-favorite">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+                <button data-slug=${item.slug} class="btn btn-primary btn-sm pull-xs-right btn-unfavorite hidden">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+              `
+            }
+            text += `
+            <div class="article-preview">
+              <div class="article-meta">
+                <a href='/profile.html?author=${item.author.username}'><img src="${item.author.image}" /></a>
+                <div class="info">
+                  <a href='/profile.html?author=${item.author.username}' data-article='${item.author.username}' class="author">${item.author.username}</a>
+                  <span class="date">January 20th</span>
+                </div>
+                ${btn}
+              </div>
+              <a href="article.html?feed=${item.slug}" class="preview-link">
+                <h1>${item.title}</h1>
+                <p>${item.body}</p>
+                <span>Read more...</span>
+                <ul class="tag-list-art">
+                  ${tag}
+                </ul>
+              </a>
+            </div>
+            `
+
+            if (document.querySelector('.list-article')) {
+              document.querySelector('.list-article').innerHTML = text
+            }
+          })
+          document.querySelector('.toggle-favor').classList.add('active')
+          document.querySelector('.toggle-art').setAttribute('href', `profile.html?author=${profileLocal}`)
+          document.querySelector('.toggle-art').classList.remove('active')
+
+          favorBtn()
+          unfavorBtn()
+        })
+        .catch(err => { throw err })
+    } else if (urlString.get('favor') === infoLocal) {
+      return axios({
+        method: 'get',
+        headers: {
+          'Content-type': 'application/json; charset=utf-8'
+        },
+        url: `/articles?favorited=${JSON.parse(localStorage.info).username}`
+      })
+        .then(res => {
+          console.log(res)
+          document.querySelector('.toggle-favor').classList.add('active')
+          document.querySelector('.toggle-art').classList.remove('active')
+          document.querySelector('.toggle-art').setAttribute('href', 'profile.html')
+          if (res.data.articles.length === 0) {
+            document.querySelector('.list-article').innerHTML = 'No acticles here........'
+          } else {
+            let text = ''
+            res.data.articles.map(item => {
+              // Check img
+              if (!item.author.image) {
+                item.author.image = localStorage.image
+              }
+              let tag = ''
+              item.tagList.map(x => {
+                tag += `
+                  <li class="tag-default tag-pill tag-outline"><span>${x}</span></li>
+                `
+              })
+              // Show favor or unfavor
+              let btn = ''
+              if (item.favorited) {
+                btn = `
+                <button data-slug=${item.slug} class="btn btn-outline-primary btn-sm pull-xs-right btn-favorite hidden">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+                <button data-slug=${item.slug} class="btn btn-primary btn-sm pull-xs-right btn-unfavorite">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+                
+                `
+              } else {
+                btn = `
+                <button data-slug=${item.slug} class="btn btn-outline-primary btn-sm pull-xs-right btn-favorite">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+                <button data-slug=${item.slug} class="btn btn-primary btn-sm pull-xs-right btn-unfavorite hidden">
+                  <i class="ion-heart"></i>
+                  <span class="counter">${item.favoritesCount}</span>
+                </button>
+              `
+              }
+              text += `
+              <div class="article-preview">
+                <div class="article-meta">
+                  <a href='/profile.html?author=${item.author.username}'><img src="${item.author.image}" /></a>
+                  <div class="info">
+                    <a href='/profile.html?author=${item.author.username}' data-article='${item.author.username}' class="author">${item.author.username}</a>
+                    <span class="date">January 20th</span>
+                  </div>
+                  ${btn}
+                </div>
+                <a href="article.html?feed=${item.slug}" class="preview-link">
+                  <h1>${item.title}</h1>
+                  <p>${item.body}</p>
+                  <span>Read more...</span>
+                  <ul class="tag-list-art">
+                    ${tag}
+                  </ul>
+                </a>
+              </div>
+              `
+
+              if (document.querySelector('.list-article')) {
+                document.querySelector('.list-article').innerHTML = text
+              }
+            })
+          }
+
+          favorBtn()
+          unfavorBtn()
+        })
+        .catch(err => {
+          console.log(err.response)
+        })
+    }
+  }
+}
+
+// List tag
+export const listTag = () => {
+  if (document.querySelector('.home-page')) {
+    const urlString = new URLSearchParams(window.location.search)
+    if (!window.location.search || urlString.has('tag')) {
+      return axios({
+        method: 'get',
+        headers: {
+          'Content-type': 'application/json; charset=utf-8'
+        },
+        url: '/tags'
+      })
+        .then(res => {
+          let tag = ''
+          res.data.tags.map(item => {
+            tag += `
+              <a href="index.html?tag=${item}" class="tag-pill tag-default">${item}</a>`
+            document.querySelector('.tag-list').innerHTML = tag
+          })
+        })
+        .catch(err => { throw err })
+    }
+  }
 }
 
 // Get profile
 export const getProfile = () => {
   const urlString = new URLSearchParams(window.location.search)
-  if (urlString.has('exam')) {
+  if (urlString.has('author')) {
     return axios({
       method: 'get',
-      url: '/profiles/' + urlString.get('exam'),
+      url: '/profiles/' + urlString.get('author'),
       headers: {
         'Content-type': 'application/json; charset=utf-8'
       }
@@ -220,8 +710,27 @@ export const getProfile = () => {
         document.querySelector('.user-img').setAttribute('src', res.data.profile.image)
         document.querySelector('.name-user').innerHTML = res.data.profile.username
         document.querySelector('.bio').innerHTML = res.data.profile.bio
-        document.querySelector('.btn-edit').classList.add('hidden')
-        document.querySelector('.btn-follow').classList.remove('hidden')
+        const infoLocal = JSON.parse(localStorage.info)
+        if (res.data.profile.username !== infoLocal.username) {
+          document.querySelector('.btn-edit').classList.add('hidden')
+          document.querySelector('.btn-follow').classList.remove('hidden')
+          document.querySelector('.btn-follow').innerHTML = `
+          <i class="ion-plus-round"></i> &nbsp;Follow ${res.data.profile.username}
+          `
+        }
+        // Local Storage username to folow method
+        localStorage.setItem('profile', JSON.stringify(res.data.profile))
+
+        // btn-follow and btn-unfollow
+        const profileLocal = JSON.parse(localStorage.profile).following
+        if (profileLocal) {
+          document.querySelectorAll('.btn-follow').forEach(btn => {
+            btn.classList.add('hidden')
+          })
+          document.querySelectorAll('.btn-unfollow').forEach(btn => {
+            btn.classList.remove('hidden')
+          })
+        }
       })
       .catch(err => { throw err })
   }
@@ -236,12 +745,10 @@ export const getUser = () => {
         method: 'get',
         url: '/user',
         headers: {
-          Authorization: 'Token ' + JSON.parse(localStorage.info).token,
           'Content-type': 'application/json; charset=utf-8'
         }
       })
         .then(res => {
-          // localStorage.setItem('user', JSON.stringify(res.data.user))
           window.location = 'profile.html'
         })
         .catch(err => { throw err })
@@ -283,10 +790,14 @@ export const getArticle = () => {
       url: '/articles/' + urlString.get('feed')
     })
       .then(res => {
+        // Check img ''
+        if (!res.data.article.author.image) {
+          res.data.article.author.image = localStorage.image
+        }
         localStorage.setItem('slug', res.data.article.slug)
         document.querySelector('.title').innerHTML = res.data.article.title
         document.querySelectorAll('.article-img').forEach(e => {
-          e.setAttribute('href', `profile.html?exam=${res.data.article.author.username}`)
+          e.setAttribute('href', `profile.html?author=${res.data.article.author.username}`)
         })
 
         document.querySelectorAll('.author-img').forEach(e => {
@@ -295,8 +806,9 @@ export const getArticle = () => {
 
         document.querySelectorAll('.author').forEach(e => {
           e.innerHTML = res.data.article.author.username
-          e.setAttribute('href', `profile.html?exam=${res.data.article.author.username}`)
+          e.setAttribute('href', `profile.html?author=${res.data.article.author.username}`)
         })
+        document.querySelector('.comment-author-img').setAttribute('src', res.data.article.author.image)
 
         document.querySelectorAll('.btn-follow-art').forEach(e => {
           e.innerHTML = `
@@ -304,16 +816,39 @@ export const getArticle = () => {
           &nbsp;
           Follow ${res.data.article.author.username} <span class="counter">(10)</span>
           `
-          document.querySelector('.article-body').innerHTML = res.data.article.body
         })
+        document.querySelector('.article-body').innerHTML = res.data.article.body
 
-        // Check img
-        const infoLocal = JSON.parse(localStorage.info)
-        if (infoLocal.image) {
-          document.querySelector('.comment-author-img').setAttribute('src', infoLocal.image
-          )
+        // Check who's article
+        const infoLocal = JSON.parse(localStorage.info).username
+        if (res.data.article.author.username === infoLocal) {
+          document.querySelectorAll('.btn-follow-art').forEach(btn => {
+            // btn.closest('a').setAttribute('href', 'create-edit-article.html?edit')
+            btn.classList.add('hidden')
+          })
+          document.querySelectorAll('.btn-favor').forEach(btn => {
+            btn.classList.add('hidden')
+          })
         } else {
-          document.querySelector('.comment-author-img').setAttribute('src', localStorage.getItem('image'))
+          document.querySelectorAll('.btn-del-art').forEach(btn => {
+            btn.classList.add('hidden')
+          })
+          document.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.classList.add('hidden')
+          })
+        }
+        // Local storage username to follow method
+        localStorage.setItem('profile', JSON.stringify(res.data.article.author))
+
+        // btn-follow and btn-unfollow
+        const profileLocal = JSON.parse(localStorage.profile).following
+        if (profileLocal) {
+          document.querySelectorAll('.btn-follow').forEach(btn => {
+            btn.classList.add('hidden')
+          })
+          document.querySelectorAll('.btn-unfollow').forEach(btn => {
+            btn.classList.remove('hidden')
+          })
         }
       })
       .catch(err => {
@@ -332,7 +867,6 @@ export const createCmt = () => {
         method: 'post',
         url: '/articles/' + e.target.dataset.slug + '/comments',
         headers: {
-          Authorization: 'Token ' + JSON.parse(localStorage.info).token,
           'Content-type': 'application/json; charset=utf-8'
         },
         data: {
@@ -342,7 +876,6 @@ export const createCmt = () => {
         }
       })
         .then(res => {
-          console.log(res)
           const text =
             `
               <div class="card">
@@ -350,11 +883,11 @@ export const createCmt = () => {
                   <p class="card-text">${res.data.comment.body}</p>
                 </div>
                 <div class="card-footer">
-                  <a href="profile.html?exam=${JSON.parse(localStorage.info).username}" class="comment-author">
+                  <a href="profile.html?author=${JSON.parse(localStorage.info).username}" class="comment-author">
                     <img src="${localStorage.image}" class="comment-author-img" />
                   </a>
                   &nbsp;
-                  <a href="profile.html?exam=${JSON.parse(localStorage.info).username}" class="comment-author">${res.data.comment.author.username}</a>
+                  <a href="profile.html?author=${JSON.parse(localStorage.info).username}" class="comment-author">${res.data.comment.author.username}</a>
                   <span class="date-posted">Dec 29th</span>
                   <span class="mod-options" data-user='${res.data.comment.author.username}'>
                     <i class="ion-edit"></i>
@@ -418,11 +951,11 @@ export const getComment = () => {
                 <p class="card-text">${item.body}</p>
               </div>
               <div class="card-footer">
-                <a href="profile.html?exam=${JSON.parse(localStorage.info).username}" class="comment-author">
+                <a href="profile.html?author=${JSON.parse(localStorage.info).username}" class="comment-author">
                   <img src="${localStorage.image}" class="comment-author-img" />
                 </a>
                 &nbsp;
-                <a href="profile.html?exam=${JSON.parse(localStorage.info).username}"            class="comment-author commented">${item.author.username}</a>
+                <a href="profile.html?author=${JSON.parse(localStorage.info).username}"          class="comment-author commented">${item.author.username}</a>
                 <span class="date-posted">Dec 29th</span>
                 <span data-user='${item.author.username}' class="mod-options">
                   <i class="ion-edit"></i>
@@ -461,13 +994,12 @@ export const delCmt = () => {
         return axios({
           method: 'delete',
           headers: {
-            'Content-type': 'application/json; charset=utf-8',
-            Authorization: 'Token ' + JSON.parse(localStorage.info).token
+            'Content-type': 'application/json; charset=utf-8'
           },
           url: '/articles/' + urlString.get('feed') + '/comments/' + e.target.dataset.del
         })
           .then(res => {
-            e.target.parentNode.parentNode.parentNode.remove()
+            e.target.closest('.card').remove()
           })
           .catch(err => { throw err })
       })

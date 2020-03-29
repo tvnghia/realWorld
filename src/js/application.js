@@ -1,5 +1,5 @@
-import { checkUser, signUp, loGin, updateUser, listArticle, getProfile, getUser, showUser, newUser, getArticle, createCmt, getComment } from './init'
-
+import { checkUser, signUp, loGin, updateUser, listArticle, getProfile, getUser, showUser, newUser, getArticle, createCmt, getComment, listTag, favorArt } from './init'
+import { newArt, newTag, editArt, checkPage, delArt, feedArt, followUser, unfollowUser, logOut } from './article'
 window.addEventListener('DOMContentLoaded', function () {
   signUp()
   checkUser()
@@ -13,4 +13,15 @@ window.addEventListener('DOMContentLoaded', function () {
   getArticle()
   createCmt()
   getComment()
+  newArt()
+  newTag()
+  editArt()
+  checkPage()
+  delArt()
+  feedArt()
+  followUser()
+  unfollowUser()
+  listTag()
+  favorArt()
+  logOut()
 })
