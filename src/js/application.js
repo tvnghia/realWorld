@@ -1,27 +1,36 @@
-import { checkUser, signUp, loGin, updateUser, listArticle, getProfile, getUser, showUser, newUser, getArticle, createCmt, getComment, listTag, favorArt } from './init'
-import { newArt, newTag, editArt, checkPage, delArt, feedArt, followUser, unfollowUser, logOut } from './article'
+import * as profile from './Profile'
+import * as art from './article'
+import * as users from './users'
+import * as functions from './function'
+import * as user from './user'
+import * as tag from './listtag'
 window.addEventListener('DOMContentLoaded', function () {
-  signUp()
-  checkUser()
-  loGin()
-  updateUser()
-  listArticle()
-  getProfile()
-  getUser()
-  showUser()
-  newUser()
-  getArticle()
-  createCmt()
-  getComment()
-  newArt()
-  newTag()
-  editArt()
-  checkPage()
-  delArt()
-  feedArt()
-  followUser()
-  unfollowUser()
-  listTag()
-  favorArt()
-  logOut()
+  profile.getProfile()
+  profile.unfollowUser()
+  profile.logOut()
+  profile.followUser()
+
+  art.listArt()
+  art.newArt()
+  art.getArt()
+  art.editArt()
+  art.delArt()
+  art.feedArt()
+  art.favorArt()
+  art.createCmt()
+  art.getComment()
+
+  users.signUp()
+  users.loGin()
+
+  functions.showUser()
+  functions.checkPage()
+  functions.checkUser()
+  functions.newTag()
+
+  user.getUser()
+  user.updateUser()
+  user.newUser()
+
+  tag.listTag()
 })
