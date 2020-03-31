@@ -1,4 +1,4 @@
-import * as profile from './Profile'
+import * as profile from './profile'
 import * as art from './article'
 import * as users from './users'
 import * as functions from './function'
@@ -27,6 +27,7 @@ window.addEventListener('DOMContentLoaded', function () {
   functions.checkPage()
   functions.checkUser()
   functions.newTag()
+  functions.disableLink()
 
   user.getUser()
   user.updateUser()

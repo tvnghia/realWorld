@@ -9,8 +9,10 @@ export const checkUser = () => {
     document.querySelector('.regis').classList.add('regis')
   } else {
     document.querySelector('.post-new-article').parentNode.classList.add('hidden')
-    document.querySelector('.setting').innerHTML = 'Sign in'
-    document.querySelector('.setting').setAttribute('href', 'login.html')
+    if (document.querySelector('.setting')) {
+      document.querySelector('.setting').innerHTML = 'Sign in'
+      document.querySelector('.setting').setAttribute('href', 'login.html')
+    }
     document.querySelector('.regis').classList.remove('regis')
   }
 }
@@ -71,4 +73,17 @@ export const newTag = () => {
 // Routing
 export const rouTing = (browser) => {
   window.location = browser
+}
+
+// Disable link
+export const disableLink = () => {
+  if (infoLocal.token) {
+    if (window.location.pathname === '/login.html' || window.location.pathname === '/signup.html') {
+      rouTing('index.html')
+    }
+  } else {
+    if (window.location.pathname === '/setting.html') {
+      rouTing('signup.html')
+    }
+  }
 }

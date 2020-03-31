@@ -715,6 +715,10 @@ const favorBtn = () => {
             btn.classList.add('hidden')
             btn.nextElementSibling.classList.remove('hidden')
           })
+          .catch(err => {
+            console.log(err)
+            rouTing('login.html')
+          })
       })
     })
   }
