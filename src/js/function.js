@@ -67,3 +67,8 @@ export const newTag = () => {
     })
   }
 }
+
+// Routing
+export const rouTing = (browser) => {
+  window.location = browser
+}

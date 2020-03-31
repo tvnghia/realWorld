@@ -1,4 +1,5 @@
 import repoFactories from './axiosRepo/repoFactories'
+import { rouTing } from './function'
 const userApi = repoFactories.get('user')
 
 const infoLocal = JSON.parse(localStorage.info)
@@ -12,7 +13,7 @@ export const getUser = () => {
 
         return userApi.currentUser()
           .then(res => {
-            window.location = 'profile.html'
+            rouTing('index.html')
           })
           .catch(err => { throw err })
       })
@@ -37,7 +38,7 @@ export const updateUser = () => {
       })
         .then(res => {
           localStorage.setItem('info', JSON.stringify(res.data.user))
-          window.location = 'profile.html'
+          rouTing('index.html')
         })
         .catch(err => { throw err })
     })

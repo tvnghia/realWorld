@@ -1,6 +1,7 @@
 import repoFactories from './axiosRepo/repoFactories'
 
 import axios from 'axios'
+import { rouTing } from './function'
 const profileApi = repoFactories.get('profiles')
 
 const infoLocal = JSON.parse(localStorage.info)
@@ -68,7 +69,7 @@ export const logOut = () => {
     document.querySelector('.btn-logout').addEventListener('click', e => {
       e.preventDefault()
       localStorage.setItem('info', JSON.stringify({}))
-      window.location = 'index.html'
+      rouTing('index.html')
     })
   }
 }

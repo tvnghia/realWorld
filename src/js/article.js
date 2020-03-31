@@ -1,4 +1,5 @@
 import RepoFactories from './axiosRepo/repoFactories'
+import { rouTing } from './function'
 const artApi = RepoFactories.get('articles')
 const infoLocal = JSON.parse(localStorage.info)
 
@@ -325,7 +326,7 @@ export const newArt = () => {
         .then(res => {
           console.log(res)
           localStorage.setItem('newart', JSON.stringify(res.data.article))
-          window.location = `article.html?feed=${JSON.parse(localStorage.newart).slug}`
+          rouTing(`article.html?feed=${JSON.parse(localStorage.newart).slug}`)
         })
         .catch(err => {
           console.log(err.response)
@@ -426,7 +427,7 @@ export const editArt = () => {
         .then(res => {
           console.log(res)
           localStorage.setItem('newart', JSON.stringify(res.data.article))
-          window.location = 'index.html'
+          rouTing('index.html')
         })
         .catch(err => {
           console.log(err.response)
@@ -443,7 +444,7 @@ export const delArt = () => {
         return artApi.delArt(localStorage.slug)
           .then(res => {
             console.log(res)
-            window.location = 'index.html'
+            rouTing('index.html')
           })
           .catch(err => { throw err })
       })
@@ -748,7 +749,7 @@ export const getComment = () => {
     //   },
     //   url: '/articles/' + urlString.get('feed') + '/comments'
     // })
-    return artApi(urlString.get('feed'))
+    return artApi.getComment(urlString.get('feed'))
       .then(res => {
         let text = ''
         res.data.comments.map(item => {

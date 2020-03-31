@@ -1,4 +1,5 @@
 import repoFactories from './axiosRepo/repoFactories'
+import { rouTing } from './function'
 const usersApi = repoFactories.get('users')
 
 // Signup
@@ -17,7 +18,7 @@ export const signUp = () => {
         .then(res => {
           localStorage.setItem('info', JSON.stringify(res.data.user))
           localStorage.setItem('image', 'https://static.productionready.io/images/smiley-cyrus.jpg')
-          window.location = 'index.html'
+          rouTing('index.html')
         })
         .catch(err => {
           const arr = err.response.data.errors
@@ -80,7 +81,7 @@ export const loGin = () => {
         .then(res => {
           localStorage.setItem('info', JSON.stringify(res.data.user))
           localStorage.setItem('image', 'https://static.productionready.io/images/smiley-cyrus.jpg')
-          window.location = 'index.html'
+          rouTing('index.html')
         })
         .catch(err => { throw err })
     })
