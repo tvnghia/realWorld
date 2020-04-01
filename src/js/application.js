@@ -20,8 +20,8 @@ window.addEventListener('DOMContentLoaded', function () {
   art.createCmt()
   art.getComment()
 
-  users.signUp()
   users.loGin()
+  users.signUp()
 
   functions.showUser()
   functions.checkPage()
